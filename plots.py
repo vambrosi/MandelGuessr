@@ -97,33 +97,9 @@ class SetView:
         )
 
         if find_zoom:
-            ratio = mean(isnan(self.img))
-
-            for _ in range(15):
-                if ratio > 0.01:
-                    self.diam /= (0.04 / ratio)**(1/2)
-                else:
-                    self.diam /= 10
-
-                mandel_grid(
-                    self.center,
-                    self.diam,
-                    self.img,
-                    512,
-                    100.0,
-                )
-                ratio = mean(isnan(self.img))
-
-                if 0.02 < ratio < 0.06:
-                    break
-
-            mandel_grid(
-                self.center,
-                self.diam,
-                self.img,
-                2048,
-                100.0,
-            )
+            self.find_zoom(is_init=True)
+            x, y = self.z_to_img_coords(self.center)
+            (self.dist_plt,) = self.ax.plot([x], [y], "ro-")
         else:
             (self.dist_plt,) = self.ax.plot([], [], "ro-", alpha=0.75)
 
@@ -186,3 +162,41 @@ class SetView:
         img_coords = (z - sw) / delta
 
         return img_coords.real, img_coords.imag
+
+    def find_zoom(self, is_init=False):
+        ratio = mean(isnan(self.img))
+        # print("NAN ratio:", ratio, "\tDiameter:", self.diam)
+
+        lower = 0.02
+        ideal = 0.04
+        upper = 0.06
+
+        for _ in range(20):
+            if ratio > 4e-8:
+                self.diam /= (ideal / ratio)**(1/2)
+            else:
+                self.diam /= 1000
+
+            mandel_grid(
+                self.center,
+                self.diam,
+                self.img,
+                512,
+                100.0,
+            )
+            ratio = mean(isnan(self.img))
+            # print("NAN ratio:", ratio, "\tDiameter:", self.diam)
+
+            if lower < ratio < upper or self.diam > 0.05:
+                break
+
+        mandel_grid(
+            self.center,
+            self.diam,
+            self.img,
+            2048,
+            100.0,
+            )
+
+        if not is_init:
+            self.plt.set_data(color_shift_scale(self.img, self.fig_wrap.color_shift))
