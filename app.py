@@ -27,7 +27,7 @@ class SetViewer(Tk):
         self.pause_var = BooleanVar(self, False)
         self.protocol("WM_DELETE_WINDOW", self.closing)
 
-        with open("roots10.json", "r") as f:
+        with open("roots.json", "r") as f:
             self.roots = json.load(f)
 
         self.roots = [complex(root[0], root[1]) for root in self.roots]
