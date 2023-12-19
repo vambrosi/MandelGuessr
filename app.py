@@ -79,7 +79,7 @@ class SetViewer(Tk):
                 "S: Pans view   ",
                 "G: Guess center",
                 "",
-                "Press any key to start!",
+                "Press SPACE to start!",
             )
         )
         text = self.fig_wrap.fig.text(
@@ -103,7 +103,7 @@ class SetViewer(Tk):
                 f"Points in this round:       {self.points_last_round:15d}",
                 f"Distance to correct center: {self.dist:2.13f}",
                 "",
-                "Press any key to continue!",
+                "Press SPACE to continue!",
             )
         )
         text = self.fig_wrap.fig.text(
@@ -186,8 +186,9 @@ class SetViewer(Tk):
         key = event.key
 
         if self.pause_var.get():
-            self.pause_var.set(False)
-            self.canvas.draw_idle()
+            if key == " ":
+                self.pause_var.set(False)
+                self.canvas.draw_idle()
             return
 
         elif key in self.shortcuts and event.inaxes == self.mandel_view.ax:
